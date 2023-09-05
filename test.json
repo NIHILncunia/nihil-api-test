@@ -1,0 +1,69 @@
+{
+  "uuid": "9xxM1jPvQKG1GM1HyjbpJQ==",
+  "id": 81089767447,
+  "host_id": "FkcNxeXvRd20tn0sa82zwA",
+  "host_email": "nihil_ncunia@naver.com",
+  "topic": "xyz",
+  "type": 1,
+  "status": "waiting",
+  "timezone": "Asia/Seoul",
+  "created_at": "2023-08-22T05:10:38Z",
+  "start_url": "https://us05web.zoom.us/s/81089767447?zak=eyJ0eXAiOiJKV1QiLCJzdiI6IjAwMDAwMSIsInptX3NrbSI6InptX28ybSIsImFsZyI6IkhTMjU2In0.eyJhdWQiOiJjbGllbnRzbSIsInVpZCI6IkZrY054ZVh2UmQyMHRuMHNhODJ6d0EiLCJpc3MiOiJ3ZWIiLCJzayI6IjAiLCJzdHkiOjEwMCwid2NkIjoidXMwNSIsImNsdCI6MCwibW51bSI6IjgxMDg5NzY3NDQ3IiwiZXhwIjoxNjkyNjg4MjM4LCJpYXQiOjE2OTI2ODEwMzgsImFpZCI6Il9nOG1KSml2UmJpNllQcm9fbU56X3ciLCJjaWQiOiIifQ.vde-RmrbVgWxGTzbYJOA1Ytwm3nxD8E-BMCrxtMwwvU",
+  "join_url": "https://us05web.zoom.us/j/81089767447?pwd=3bR8JECCgbSUcT2mkctNNx4RllJYXE.1",
+  "password": "2QafZL",
+  "h323_password": "958213",
+  "pstn_password": "958213",
+  "encrypted_password": "3bR8JECCgbSUcT2mkctNNx4RllJYXE.1",
+  "settings": {
+    "host_video": false,
+    "participant_video": false,
+    "cn_meeting": false,
+    "in_meeting": false,
+    "join_before_host": false,
+    "jbh_time": 0,
+    "mute_upon_entry": false,
+    "watermark": false,
+    "use_pmi": false,
+    "approval_type": 2,
+    "audio": "voip",
+    "auto_recording": "none",
+    "enforce_login": false,
+    "enforce_login_domains": "",
+    "alternative_hosts": "",
+    "alternative_host_update_polls": false,
+    "close_registration": false,
+    "show_share_button": false,
+    "allow_multiple_devices": false,
+    "registrants_confirmation_email": true,
+    "waiting_room": false,
+    "request_permission_to_unmute_participants": false,
+    "registrants_email_notification": true,
+    "meeting_authentication": false,
+    "encryption_type": "enhanced_encryption",
+    "approved_or_denied_countries_or_regions": {
+      "enable": false
+    },
+    "breakout_room": {
+      "enable": false
+    },
+    "internal_meeting": false,
+    "continuous_meeting_chat": {
+      "enable": false,
+      "auto_add_invited_external_users": false
+    },
+    "participant_focused_meeting": false,
+    "alternative_hosts_email_notification": true,
+    "show_join_info": false,
+    "device_testing": false,
+    "focus_mode": false,
+    "enable_dedicated_group_chat": false,
+    "private_meeting": false,
+    "email_notification": true,
+    "host_save_video_order": false,
+    "sign_language_interpretation": {
+      "enable": false
+    },
+    "email_in_attendee_report": false
+  },
+  "pre_schedule": false
+}
