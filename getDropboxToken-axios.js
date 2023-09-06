@@ -60,15 +60,13 @@ class DropboxAPI {
     url += `&grant_type=authorization_code`;
     url += `&code=${code}`;
 
-    return fetch(url, {
-      method: 'POST',
+    return axios.post(url, {}, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
       },
     }).then((response) => {
-      return response.json();
-    }).then((response) => {
-      return response;
+      console.log('getToken >> ', response.data);
+      return response.data;
     });
   }
 
@@ -119,42 +117,31 @@ class DropboxAPI {
 
   getUserInfo() {
     const url = `https://api.dropboxapi.com/2/users/get_current_account`;
-    
-    return this.signIn().then(() => fetch(url, {
-      method: 'POST',
+
+    return this.signIn().then(() => axios.post(url, {}, {
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
       },
     }).then((response) => {
-      return response.json();
-    }).then((response) => {
-      console.log(response);
-      
-      return response;
-    }));
+      console.log('getUserInfo >> ', response.data);
+      return response.data;
+    }))
   }
 
   createFolder() {
     const url = `https://api.dropboxapi.com/2/files/create_folder_v2`;
 
-    const utf8FileName = iconv.decode(Buffer.from(localFilePath, 'binary'), 'ISO-8859-1');
-
-    return this.signIn().then(() => fetch(url, {
-      method: 'POST',
+    return this.signIn().then(() => axios.post(url, {
+      autorename: false,
+      path: '/myapps'
+    }, {
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        autorename: false,
-        path: '/myapps'
-      }),
     }).then((response) => {
-      return response.json();
-    }).then((response) => {
-      console.log(response);
-
-      return response;
+      console.log('createFolder >> ', response.data);
+      return response.data;
     }));
   }
 
@@ -163,10 +150,14 @@ class DropboxAPI {
    * @param {File} file
    * */
   uploadStart(file) {
+    console.log('uploadStart file >> ', file);
+
     const url = `https://content.dropboxapi.com/2/files/upload_session/start`;
-    
-    return fetch(url, {
-      method: 'POST',
+
+    // const formData = new FormData();
+    // formData.append('file', file);
+
+    return axios.post(url, file, {
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
         'Content-Type': 'application/octet-stream',
@@ -174,9 +165,9 @@ class DropboxAPI {
           close: false,
         }),
       },
-      body: file,
     }).then((response) => {
-      return response.json();
+      console.log('uploadStart >> ', response.data);
+      return response.data;
     });
   }
   
@@ -187,6 +178,7 @@ class DropboxAPI {
    * @param {string} mode
    * */
   uploadFinish(file, sessionId, mode = 'add', rev = '') {
+    console.log('uploadFinish file >> ', file);
     const url = `https://content.dropboxapi.com/2/files/upload_session/finish`;
 
     const addObj = {
@@ -204,7 +196,7 @@ class DropboxAPI {
     
     const metadata = {
       "commit": {
-        "autorename": false,
+        "autorename": true,
         ...obj,
         "mute": false,
         "path": `/myapps/${encodeURIComponent(file.name)}`,
@@ -215,18 +207,17 @@ class DropboxAPI {
         "session_id": sessionId,
       }
     };
-    
-    return fetch(url, {
-      method: 'POST',
+
+    return axios.post(url, file, {
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
         'Content-Type': 'application/octet-stream',
         'Dropbox-API-Arg': JSON.stringify(metadata),
       },
-      body: file,
     }).then((response) => {
-      return response.json();
-    }).catch(console.error);
+      console.log('uploadFinish >> ', response.data);
+      return response.data;
+    });
   }
 
   /**
@@ -245,23 +236,20 @@ class DropboxAPI {
     } else if (mode === 'encode') {
       to_path = `/myapps/${encodeURIComponent(fileName)}`;
     }
-    
-    return fetch(url, {
-      method: 'POST',
+
+    return axios.post(url, {
+      allow_ownership_transfer: false,
+      autorename: true,
+      from_path: path,
+      to_path,
+    }, {
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
         'Content-Type': 'application/json; charset=utf-8',
       },
-      body: JSON.stringify({
-        allow_ownership_transfer: false,
-        autorename: true,
-        from_path: path,
-        to_path,
-      }),
     }).then((response) => {
-      return response.json();
-    }).then((response) => {
-      return response;
+      console.log('fileNameChange >> ', response.data);
+      return response.data;
     });
   }
   
@@ -270,20 +258,15 @@ class DropboxAPI {
    * @param {File} file
    * */
   uploadFile(file) {
+    console.log('file >> ', file);
     return this.signIn().then(() => (
       this.uploadStart(file).then((response) => {
         return response.session_id;
       })
     )).then((sessionId) => (
-      this.uploadFinish(file, sessionId).then((response) => {
-        console.log('파일 업로드 결과 >> ', response);
-        return response;
-      })
+      this.uploadFinish(file, sessionId)
     )).then((response) => (
-      this.fileNameChange(response.path_display, file.name).then((response) => {
-        console.log('파일 업데이트 결과 >> ', response);
-        return response;
-      })
+      this.fileNameChange(response.path_display, file.name)
     ));
   }
 
@@ -311,7 +294,9 @@ class DropboxAPI {
         cancel() {
           resolve(null);
         },
-        linkType: 'direct',
+        linkType: 'preview',
+        folderselect: true,
+        // extensions: [], // 여기에 확장자들 넣음.
       });
     });
   }
@@ -324,8 +309,7 @@ class DropboxAPI {
   downloadFile(fileId) {
     const url = 'https://content.dropboxapi.com/2/files/download';
 
-    return fetch(url, {
-      method: 'POST',
+    return axios.post(url, null, {
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
         'Content-Type': 'application/octet-stream; charset=utf-8',
@@ -333,13 +317,14 @@ class DropboxAPI {
           path: fileId,
         }),
       },
+      responseType: 'blob',
     }).then((response) => {
-      return response.blob();
+      console.log('downloadFile >> ', response.data);
+      return response.data;
     });
   }
 
   /**
-   * 마이앱스의 파일을 드롭박스에 덮어 씌웁니다.
    * @param {File} file
    */
   updateFile(file) {
@@ -347,7 +332,6 @@ class DropboxAPI {
     return this.signIn()
       .then(() => this.fileNameChange(path, file.name, 'encode')
         .then((response) => {
-          console.log('업로드 전 파일 이름 변경 결과 >> ', response);
           return response.metadata;
         }))
       .then((filemetaData) => this.uploadStart(file)
@@ -355,17 +339,9 @@ class DropboxAPI {
           sessionId: response.session_id,
           rev: filemetaData.rev,
         })))
-      .then((response) => this.uploadFinish(file, response.sessionId, 'update', response.rev)
-        .then((finishResponse) => {
-          console.log('파일 업로드 결과 >> ', finishResponse);
-          return finishResponse;
-        }))
+      .then((response) => this.uploadFinish(file, response.sessionId, 'update', response.rev))
       .then((response) => (
         this.fileNameChange(response.path_display, file.name)
-          .then((fileChangeResponse) => {
-            console.log('업로드 완료 후 파일 이름 변경 결과', fileChangeResponse);
-            return fileChangeResponse;
-          })
       ));
   }
 }
@@ -384,9 +360,7 @@ const downloadFileButton = document.querySelector('button#download-file');
 const updateFileButton = document.querySelector('button#update-file');
 
 dropboxButton?.addEventListener('click', () => {
-  dropbox.getAccessToken().then((response) => {
-    console.log('Dropbox AccessToken >> ', response);
-  });
+  dropbox.getAccessToken();
 });
 
 getUserInfoButton?.addEventListener('click', () => {
