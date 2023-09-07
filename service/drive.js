@@ -1,142 +1,74 @@
 const getDriveInfo = document.querySelector('button#get-drive-info');
-const getDrives = document.querySelector('button#get-drives');
+
 const getTopLevelFolders = document.querySelector('button#get-top-level-folders');
 const getFilesInFolder = document.querySelector('button#get-files-in-folder');
+const createFolder = document.querySelector('button#create-folder');
+const getFileInfo = document.querySelector('button#get-file-info');
+const downloadFile = document.querySelector('button#download-file');
+
 const uploadFile = document.querySelector('button#upload-file');
 const fileInput = document.querySelector('input#file');
 const updateFileInput = document.querySelector('input#update-file-input');
 const updateFile = document.querySelector('button#update-file');
 
 getDriveInfo.addEventListener('click', () => {
-  const url = 'https://www.googleapis.com/drive/v3/about?fields=*';
-
-  fetch(url, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('googleAccessToken')}`,
-    }
-  }).then((response) => {
-    return response.json();
-  }).then((data) => {
-    console.log(data);
-  });
-});
-
-getDrives.addEventListener('click', () => {
-  const url = `https://www.googleapis.com/drive/v3/drives`;
-
-  fetch(url, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('googleAccessToken')}`,
-    }
-  }).then((response) => {
-    return response.json();
-  }).then((data) => {
-    console.log(data);
-  });
+  googleApi.getDriveInfo();
 });
 
 getTopLevelFolders.addEventListener('click', () => {
-  const url = `https://www.googleapis.com/drive/v3/files?corpora=user&q=mimeType='application/vnd.google-apps.folder' and 'root' in parents and trashed=false&orderBy=name&includeItemsFromAllDrives=false&pageSize=50&fields=*`;
-
-  fetch(url, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('googleAccessToken')}`,
-    }
-  }).then((response) => {
-    return response.json();
-  }).then((data) => {
-    console.log(data);
-  });
+  googleApi.getTopLevelFolders();
 });
 
 getFilesInFolder.addEventListener('click', () => {
-  const url = `https://www.googleapis.com/drive/v3/files?corpora=user&q='1ouV6zqSLHphG3sZkTRzIngwGE_IyIvwv' in parents and trashed=false&orderBy=name&includeItemsFromAllDrives=false&pageSize=50&fields=*`;
+  googleApi.createPicker()
+    .then((response) => {
+      return googleApi.getFilesInFolder(response.fileId);
+    });
+});
 
-  fetch(url, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('googleAccessToken')}`,
-    }
-  }).then((response) => {
-    return response.json();
-  }).then((data) => {
-    console.log(data);
-  });
+getFileInfo?.addEventListener('click', () => {
+  googleApi.createPicker();
+});
+
+createFolder?.addEventListener('click', () => {
+  const folderName = prompt('폴더 이름을 입력하세요.');
+  googleApi.createFolder(folderName);
 });
 
 uploadFile.addEventListener('click', () => {
-  const url = `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=*`;
-
   const file = fileInput.files[0];
 
-  const metadata = {
-    name: `${Date.now()}-${file.name}`,
-    mimeType: file.type,
-    parents: ['1ouV6zqSLHphG3sZkTRzIngwGE_IyIvwv'],
-  };
-  
-  const formData = new FormData();
+  const foldersResponse = googleApi.getTopLevelFolders();
+  googleApi.getTopLevelFolders().then((foldersResponse) => {
+    const folder = foldersResponse.files.find((item) => item.name === 'myapps');
 
-  formData.append('metadata', new Blob(
-    [JSON.stringify(metadata)],
-    { type: 'application/json' }
-  ));
-  formData.append('file', file);
+    const metadata = {
+      name: `${Date.now()}-${file.name}`,
+      mimeType: file.type,
+      parents: [folder.id],
+    };
 
-  console.log(formData);
-
-  fetch(url, {
-    method: 'POST',
-    headers: new Headers({
-      Authorization: `Bearer ${localStorage.getItem('googleAccessToken')}`,
-    }),
-    body: formData,
-  }).then((response) => {
-    return response.json();
-  }).then((data) => {
-    console.log(data);
-  }).catch((error) => {
-    console.error(error);
+    return googleApi.uploadToDrive(metadata, file);
   });
 });
 
 updateFile.addEventListener('click', () => {
-  createPicker((data) => {
-    console.log(resolve);
-  }).then((response) => {
-    console.log(response);
+  const file = updateFileInput.files[0];
+
+  googleApi.createPicker().then((fileInfo) => {
+    const metadata = {};
+
+    googleApi.syncAppToDrive(fileInfo.fileId, metadata, file);
   });
+});
 
-  // const url = `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart&fields=*`;
-
-  // const file = updateFileInput.files[0];
-
-  // const metadata = {
-  //   name: `${Date.now()}-${file.name}`,
-  //   mimeType: file.type,
-  //   parents: ['1ouV6zqSLHphG3sZkTRzIngwGE_IyIvwv'],
-  // };
-  
-  // const formData = new FormData();
-
-  // formData.append('metadata', new Blob(
-  //   [JSON.stringify(metadata)],
-  //   { type: 'application/json' }
-  // ));
-  // formData.append('file', file);
-
-  // console.log(formData);
-
-  // fetch(url, {
-  //   method: 'PTACH',
-  //   headers: new Headers({
-  //     Authorization: `Bearer ${localStorage.getItem('googleAccessToken')}`,
-  //   }),
-  //   body: formData,
-  // }).then((response) => {
-  //   return response.json();
-  // }).then((data) => {
-  //   console.log(data);
-  // }).catch((error) => {
-  //   console.error(error);
-  // });
+downloadFile?.addEventListener('click', () => {
+  googleApi.createPicker().then((fileInfo) => {
+    return googleApi.downloadFile(fileInfo.fileId).then((response) => {
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(response);
+      link.download = fileInfo.name;
+      link.click();
+    });
+  });
 });

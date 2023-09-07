@@ -5,10 +5,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-
-  <script async defer src="./validate.js"></script>
-  <script async defer src="./drive.js"></script>
-  <script async defer src="./picker.js"></script>
 </head>
 
 <body>
@@ -16,12 +12,12 @@
   <h2>드라이브 정보 가져오기</h2>
   <button id="get-drive-info">가져오기</button>
 
-  <h2>드라이브들 가져오기</h2>
-  <button id="get-drives">가져오기</button>
-
-  <h2>파일목록 가져오기</h2>
+  <h2>파일과 폴더</h2>
   <button id="get-top-level-folders">최상위 폴더들 가져오기</button>
   <button id="get-files-in-folder">특정 폴더 내의 파일 가져오기</button>
+  <button id="create-folder">폴더 생성하기</button>
+  <button id="get-file-info">파일 정보 가져오기</button>
+  <button id="download-file">파일 다운로드</button>
 
   <h2>파일 업로드</h2>
   <input type="file" id="file">
@@ -31,11 +27,9 @@
   <input type="file" id="update-file-input">
   <button id="update-file">업데이트</button>
 
-  <h2>파일 선택하기(Google picker 이용)</h2>
-  <button id="open-picker">선택하기</button>
-
-  <script async defer src="https://apis.google.com/js/api.js" onload="onApiLoad()"></script>
-  <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="../googleAPI.js"></script>
+  <script async defer src="./drive.js"></script>
 </body>
 
 </html>

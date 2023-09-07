@@ -31,6 +31,9 @@ class DropboxAPI {
     this.createScript();
   }
 
+  /**
+   * 토큰 발급에 필요한 코드를 가져옵니다.
+   */
   getAuthCode() {
     let url = 'https://www.dropbox.com/oauth2/authorize';
     url += `?client_id=${this.options.auth.apiKey}`;
@@ -45,13 +48,19 @@ class DropboxAPI {
     window.addEventListener('message', this.messageHandler, false);
   }
 
-  /** @param {MessageEvent} event */
+  /**
+   * 코드를 가져오기 위한 메시지 처리를 합니다.
+   * @param {MessageEvent} event
+   */
   getMessage(event) {
     this.resolve(event.data.code);
     window.removeEventListener('message', this.messageHandler, false);
   }
 
-  /** @param {string} code */
+  /**
+   * 가져온 코드로 토큰을 얻습니다.
+   * @param {string} code
+   */
   getToken(code) {
     let url = `https://api.dropboxapi.com/oauth2/token`;
     url += `?client_id=${this.options.auth.apiKey}`;
@@ -70,6 +79,9 @@ class DropboxAPI {
     });
   }
 
+  /**
+   * 발급한 토큰을 저장합니다.
+   */
   getAccessToken() {
     this.getAuthCode();
 
@@ -87,6 +99,9 @@ class DropboxAPI {
     }));
   }
 
+  /**
+   * 토큰의 유효시간을 체크합니다.
+   */
   tokenValidate() {
     if (!this.accessToken) {
       return false;
@@ -103,6 +118,9 @@ class DropboxAPI {
     return diff <= 100 ? false : true;
   }
 
+  /**
+   * 토큰이 발급되었는지 체크합니다.
+   */
   signIn() {
     let promise;
 
@@ -115,6 +133,9 @@ class DropboxAPI {
     return promise;
   }
 
+  /**
+   * 유저 정보를 가져옵니다.
+   */
   getUserInfo() {
     const url = `https://api.dropboxapi.com/2/users/get_current_account`;
 
@@ -128,6 +149,9 @@ class DropboxAPI {
     }))
   }
 
+  /**
+   * 새로운 폴더를 생성합니다.
+   */
   createFolder() {
     const url = `https://api.dropboxapi.com/2/files/create_folder_v2`;
 
@@ -345,68 +369,3 @@ class DropboxAPI {
       ));
   }
 }
-
-const dropbox = new DropboxAPI();
-
-const dropboxButton = document.querySelector('button#dropbox');
-const getUserInfoButton = document.querySelector('button#get-user-info');
-const createFolderButton = document.querySelector('button#create-folder');
-
-const fileInput = document.querySelector('input#pick');
-const uploadFileButton = document.querySelector('button#upload-file');
-
-const getFileInfoButton = document.querySelector('button#get-file-info');
-const downloadFileButton = document.querySelector('button#download-file');
-const updateFileButton = document.querySelector('button#update-file');
-
-dropboxButton?.addEventListener('click', () => {
-  dropbox.getAccessToken();
-});
-
-getUserInfoButton?.addEventListener('click', () => {
-  dropbox.getUserInfo();
-});
-
-createFolderButton?.addEventListener('click', () => {
-  dropbox.createFolder();
-});
-
-uploadFileButton?.addEventListener('click', () => {
-  /** @type {File} */
-  const file = fileInput.files[0];
-  dropbox.uploadFile(file);
-});
-
-getFileInfoButton?.addEventListener('click', () => {
-  dropbox.getFileInfo().then((response) => {
-    console.log(response);
-    
-    if (response) {
-      console.log(response.name);
-    }
-  });
-});
-
-downloadFileButton?.addEventListener('click', () => {
-  dropbox.getFileInfo()
-    .then((response) => {
-      return {
-        id: response.id,
-        name: response.name,
-      };
-  }).then((response) => {
-    return dropbox.downloadFile(response.id)
-      .then((downloadResponse) => {
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(downloadResponse);
-        link.download = response.name;
-        link.click();
-      });
-  });
-});
-
-updateFileButton?.addEventListener('click', () => {
-  /** @type {File} */
-  const file = fileInput.files[0];
-  dropbox.updateFile(file);
-});

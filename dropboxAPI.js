@@ -31,6 +31,9 @@ class DropboxAPI {
     this.createScript();
   }
 
+  /**
+   * 토큰 발급에 필요한 코드를 가져옵니다.
+   */
   getAuthCode() {
     let url = 'https://www.dropbox.com/oauth2/authorize';
     url += `?client_id=${this.options.auth.apiKey}`;
@@ -45,13 +48,19 @@ class DropboxAPI {
     window.addEventListener('message', this.messageHandler, false);
   }
 
-  /** @param {MessageEvent} event */
+  /**
+   * 코드를 가져오기 위한 메시지 처리를 합니다.
+   * @param {MessageEvent} event
+   */
   getMessage(event) {
     this.resolve(event.data.code);
     window.removeEventListener('message', this.messageHandler, false);
   }
 
-  /** @param {string} code */
+  /**
+   * 가져온 코드로 토큰을 얻습니다.
+   * @param {string} code
+   */
   getToken(code) {
     let url = `https://api.dropboxapi.com/oauth2/token`;
     url += `?client_id=${this.options.auth.apiKey}`;
@@ -72,6 +81,9 @@ class DropboxAPI {
     });
   }
 
+  /**
+   * 발급한 토큰을 저장합니다.
+   */
   getAccessToken() {
     this.getAuthCode();
 
@@ -89,6 +101,9 @@ class DropboxAPI {
     }));
   }
 
+  /**
+   * 토큰의 유효시간을 체크합니다.
+   */
   tokenValidate() {
     if (!this.accessToken) {
       return false;
@@ -105,6 +120,9 @@ class DropboxAPI {
     return diff <= 100 ? false : true;
   }
 
+  /**
+   * 토큰이 발급되었는지 체크합니다.
+   */
   signIn() {
     let promise;
 
@@ -117,6 +135,9 @@ class DropboxAPI {
     return promise;
   }
 
+  /**
+   * 유저 정보를 가져옵니다.
+   */
   getUserInfo() {
     const url = `https://api.dropboxapi.com/2/users/get_current_account`;
     
@@ -134,6 +155,9 @@ class DropboxAPI {
     }));
   }
 
+  /**
+   * 새로운 폴더를 생성합니다.
+   */
   createFolder() {
     const url = `https://api.dropboxapi.com/2/files/create_folder_v2`;
 
