@@ -8,8 +8,6 @@ const getFileInfoButton = document.querySelector('button#get-file-info');
 const downloadFileButton = document.querySelector('button#download-file');
 const updateFileButton = document.querySelector('button#update-file');
 
-const dropbox = new DropboxAPI();
-
 getUserInfoButton?.addEventListener('click', () => {
   dropbox.getUserInfo();
 });

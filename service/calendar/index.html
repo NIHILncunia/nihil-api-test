@@ -9,16 +9,13 @@
 
 <body>
   <a href="/">홈으로</a><br>
-  <h2>채널 영상 가져오기</h2>
-  <button id="get-channel-vidoes">가져오기</button>
-
-  <h2>영상 업로드</h2>
-  <input type="file" id="file" accept="video/*">
-  <button id="upload">영상 업로드</button>
+  <select id="all-calendar"></select>
+  <button id="get-calendar-by-id">특정 캘린더 가져오기</button>
+  <button id="get-calendar-events">특정 캘린더 이벤트 가져오기</button>
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="../googleAPI.js"></script>
-  <script src="./youtube.js"></script>
+  <script src="/api/googleAPI.js"></script>
+  <script src="/api/calendar.js"></script>
 </body>
 
 </html>

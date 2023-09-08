@@ -496,13 +496,14 @@ class GoogleAPI {
   getCalendarById(calendarId) {
     const url = `https://www.googleapis.com/calendar/v3/users/me/calendarList/${encodeURIComponent(calendarId)}`;
 
-    return axios.get(url, {}, {
+    return axios.get(url, {
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
         'Content-Type': 'application/json'
       }
     }).then((response) => {
       console.log('getCalendarById >> ', response.data);
+      return response.data;
     });
   }
 
@@ -514,11 +515,14 @@ class GoogleAPI {
     console.log('특정 캘린더의 모든 이벤트 가져오기');
 
     const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`;
-    return Jinja.ajax.get(url, {}, {
+    return axios.get(url, {
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
         'Content-Type': 'application/json'
       }
+    }).then((response) => {
+      console.log('getCalendarEvents >> ', response.data);
+      return response.data;
     }).then((response) => {
       return response.items.filter((item) => {
         // 일정을 가져올 때 전부 가져오지 않고 일정의 시작일이 현재 년월과 일치하는 항목들만 가져오게 임시로 개선

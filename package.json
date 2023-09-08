@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "serve": "serve -p 5500"
+  },
   "devDependencies": {
     "@types/node": "^20.4.9"
   }
